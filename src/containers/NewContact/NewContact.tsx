@@ -1,12 +1,11 @@
-import React from 'react';
 import {Contact} from '../../types';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {createContact} from '../../store/ContactThunk';
 import {selectorCreateLoading} from '../../store/ContactSlice';
 import {ButtonLoader} from '../../components/ButtonLoader/ButtonLoader';
 import {SubmitHandler, useForm} from 'react-hook-form';
+import {defaultImage} from '../../constansts/image';
 
-const defaultImage = 'https://hellomagrussia.ru/uploads/pavel-durov-rasskazal-o-sebe-v-18-let-prochital-iskusstvo-vojny-suny-czy-ne-smotryu-youtube-igrayu-v-playstation_42026_cover_752x544.webp';
 
 const NewContact = () => {
   const dispatch = useAppDispatch();

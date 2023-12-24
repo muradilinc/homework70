@@ -1,0 +1,2 @@
+export const defaultImage = 'https://hellomagrussia.ru/uploads/pavel-durov-rasskazal-o-sebe-v-18-let-prochital-iskusstvo-vojny-suny-czy-ne-smotryu-youtube-igrayu-v-playstation_42026_cover_752x544.webp';
+export const placeholderImage = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTL_JlCFnIGX5omgjEjgV9F3sBRq14eTERK9w&usqp=CAU';
