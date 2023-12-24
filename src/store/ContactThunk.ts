@@ -1,6 +1,6 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import axiosApi from '../http/axiosApi';
-import {Contact, ContactList} from '../types';
+import {Contact, ContactApi, ContactList} from '../types';
 
 export const createContact = createAsyncThunk<void, Contact>(
   'contact/create',
@@ -9,13 +9,13 @@ export const createContact = createAsyncThunk<void, Contact>(
   },
 );
 
-export const getContacts = createAsyncThunk<Contact[]>(
+export const getContacts = createAsyncThunk<ContactApi[]>(
   'contact/getAll',
   async () => {
     const response = await axiosApi.get<ContactList | null>('/contacts.json');
     const contacts = response.data;
 
-    let newContacts: Contact[] = [];
+    let newContacts: ContactApi[] = [];
 
     if (contacts) {
       newContacts = Object.keys(contacts).map(key => {
@@ -27,5 +27,17 @@ export const getContacts = createAsyncThunk<Contact[]>(
       });
     }
     return newContacts;
+  },
+);
+
+export const getOneContact = createAsyncThunk<Contact, string>(
+  'contact/getOneContact',
+  async (id) => {
+    const response = await axiosApi.get<Contact | null>(`/contacts/${id}.json`);
+    const contact = response.data;
+    if (contact === null) {
+      throw new Error('Not found!')
+    }
+    return contact;
   },
 );
