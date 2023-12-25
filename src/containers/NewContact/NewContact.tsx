@@ -1,14 +1,20 @@
 import {Contact} from '../../types';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
-import {createContact} from '../../store/ContactThunk';
-import {selectorCreateLoading} from '../../store/ContactSlice';
+import {createContact, getOneContact, updateContact} from '../../store/ContactThunk';
+import {selectorCreateLoading, selectorSingleContact} from '../../store/ContactSlice';
 import {ButtonLoader} from '../../components/ButtonLoader/ButtonLoader';
 import {SubmitHandler, useForm} from 'react-hook-form';
 import {defaultImage} from '../../constansts/image';
+import {useNavigate, useParams} from 'react-router-dom';
+import {useEffect} from 'react';
+import {HOME_PAGE} from '../../constansts/routes';
 
 
 const NewContact = () => {
+  const navigate = useNavigate();
+  const {id} = useParams() as { id: string };
   const dispatch = useAppDispatch();
+  const singleContact = useAppSelector(selectorSingleContact);
   const createLoading = useAppSelector(selectorCreateLoading);
   const {
     register,
@@ -16,14 +22,37 @@ const NewContact = () => {
     formState: {errors},
     watch,
     reset,
+    setValue,
   } = useForm<Contact>();
 
-  const createContactHandler: SubmitHandler<Contact> = (contact) => {
-    dispatch(createContact({
-      ...contact,
-      photo: contact.photo || defaultImage,
-    }));
-    reset();
+
+  useEffect(() => {
+    console.log(id);
+    if (id) {
+      dispatch(getOneContact(id));
+    }
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    if (singleContact) {
+      Object.keys(singleContact).forEach((key) => {
+        const filedName = key as keyof Contact;
+        setValue(filedName, singleContact[filedName]);
+      });
+    }
+  }, [setValue, singleContact]);
+
+  const createContactHandler: SubmitHandler<Contact> = async (contact) => {
+    if (id) {
+      await dispatch(updateContact({id, contact}));
+      navigate(HOME_PAGE);
+    } else {
+      await dispatch(createContact({
+        ...contact,
+        photo: contact.photo || defaultImage,
+      }));
+      reset();
+    }
   };
 
   return (
@@ -81,7 +110,7 @@ const NewContact = () => {
           <div>
             <img
               className="w-[200px] h-[200px] rounded-xl"
-              src={ watch('photo') ? watch('photo') : defaultImage}
+              src={watch('photo') ? watch('photo') : defaultImage}
               alt="preview"
             />
           </div>
@@ -101,6 +130,7 @@ const NewContact = () => {
         }
         <button
           type="button"
+          onClick={() => navigate(HOME_PAGE)}
           className="capitalize focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900"
         >
           back to contacts

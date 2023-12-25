@@ -5,20 +5,29 @@ import {getContacts} from '../../store/ContactThunk';
 import {placeholderImage} from '../../constansts/image';
 import Spinner from '../../components/Spinner/Spinner';
 import Modal from '../../components/Modal/Modal';
+import {Outlet, useParams} from 'react-router-dom';
+import {HOME_PAGE} from '../../constansts/routes';
 
 const HomePage = () => {
+  const {id} = useParams() as {id: string};
   const dispatch = useAppDispatch();
   const contacts = useAppSelector(selectorContacts);
   const fetchLoading = useAppSelector(selectorFetchContactsLoading);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    dispatch(getContacts());
+    if (location.pathname === HOME_PAGE) {
+      dispatch(getContacts());
+    }
   }, [dispatch]);
 
   const selectContactById = (id: string) => {
     dispatch(selectContact(id));
     setShowModal(true);
+  };
+
+  if (id) {
+    return <Outlet/>;
   }
 
   return (
@@ -29,6 +38,7 @@ const HomePage = () => {
           :
           contacts.map(contact => (
             <div
+              key={contact.id}
               className="grid grid-cols-2 items-center border border-black p-2"
               onClick={() => selectContactById(contact.id)}
             >

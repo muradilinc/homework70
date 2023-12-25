@@ -35,9 +35,23 @@ export const getOneContact = createAsyncThunk<Contact, string>(
   async (id) => {
     const response = await axiosApi.get<Contact | null>(`/contacts/${id}.json`);
     const contact = response.data;
-    if (contact === null) {
-      throw new Error('Not found!')
+    if (!contact) {
+      throw new Error('Not found!');
     }
     return contact;
+  },
+);
+
+export const updateContact = createAsyncThunk<void, {id: string, contact: Contact}>(
+  'contact/update',
+  async ({id, contact}) => {
+    await axiosApi.put(`/contacts/${id}.json`, contact);
+  },
+);
+
+export const deleteContact = createAsyncThunk<void, string>(
+  'contact/delete',
+  async (id) => {
+    await axiosApi.delete(`/contacts/${id}.json`);
   },
 );
