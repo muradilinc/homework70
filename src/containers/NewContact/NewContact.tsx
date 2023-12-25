@@ -1,7 +1,7 @@
 import {Contact} from '../../types';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
-import {createContact, getOneContact, updateContact} from '../../store/ContactThunk';
-import {selectorCreateLoading, selectorSingleContact} from '../../store/ContactSlice';
+import {createContact, getContacts, getOneContact, updateContact} from '../../store/ContactThunk';
+import {selectorCreateLoading, selectorSingleContact, selectorUpdateContactLoading} from '../../store/ContactSlice';
 import {ButtonLoader} from '../../components/ButtonLoader/ButtonLoader';
 import {SubmitHandler, useForm} from 'react-hook-form';
 import {defaultImage} from '../../constansts/image';
@@ -16,6 +16,7 @@ const NewContact = () => {
   const dispatch = useAppDispatch();
   const singleContact = useAppSelector(selectorSingleContact);
   const createLoading = useAppSelector(selectorCreateLoading);
+  const updateLoading = useAppSelector(selectorUpdateContactLoading);
   const {
     register,
     handleSubmit,
@@ -27,7 +28,6 @@ const NewContact = () => {
 
 
   useEffect(() => {
-    console.log(id);
     if (id) {
       dispatch(getOneContact(id));
     }
@@ -45,6 +45,8 @@ const NewContact = () => {
   const createContactHandler: SubmitHandler<Contact> = async (contact) => {
     if (id) {
       await dispatch(updateContact({id, contact}));
+      await dispatch(getContacts());
+      reset();
       navigate(HOME_PAGE);
     } else {
       await dispatch(createContact({
@@ -67,19 +69,27 @@ const NewContact = () => {
           <p>Preview photo</p>
         </div>
         <div className="col-span-1 flex flex-col gap-y-3">
-          <input
-            {...register('name', {required: true})}
-            className="bg-gray-50 outline-0 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          />
           <div>
             <input
-              {...register('phone', {pattern: /^\+?[0-9]*$/})}
+              {...register('name', {required: true})}
+              className="bg-gray-50 outline-0 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            />
+            {
+              errors.name &&
+              <p className="mt-2 text-sm text-red-600 dark:text-red-500">
+                <span className="font-medium">Oh, snapp!</span> Enter your name.
+              </p>
+            }
+          </div>
+          <div>
+            <input
+              {...register('phone', {required: true, pattern: /^\+?[0-9]*$/})}
               className="bg-gray-50 outline-0 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             />
             {
               errors.phone &&
               <p className="mt-2 text-sm text-red-600 dark:text-red-500">
-                <span className="font-medium">Oh, snapp!</span> Some error message.
+                <span className="font-medium">Oh, snapp!</span> Enter correct data form.
               </p>
             }
           </div>
@@ -91,7 +101,7 @@ const NewContact = () => {
             {
               errors.email &&
               <p className="mt-2 text-sm text-red-600 dark:text-red-500">
-                <span className="font-medium">Oh, snapp!</span> Some error message.
+                <span className="font-medium">Oh, snapp!</span> Enter correct data form.
               </p>
             }
           </div>
@@ -103,7 +113,7 @@ const NewContact = () => {
             {
               errors.photo &&
               <p className="mt-2 text-sm text-red-600 dark:text-red-500">
-                <span className="font-medium">Oh, snapp!</span> Some error message.
+                <span className="font-medium">Oh, snapp!</span> Enter correct link image.
               </p>
             }
           </div>
@@ -118,8 +128,8 @@ const NewContact = () => {
       </div>
       <div className="flex gap-x-3">
         {
-          createLoading ?
-            <ButtonLoader/>
+          createLoading || updateLoading ?
+            <ButtonLoader color="bg-green-700"/>
             :
             <button
               type="submit"
@@ -130,6 +140,7 @@ const NewContact = () => {
         }
         <button
           type="button"
+          disabled={createLoading || updateLoading}
           onClick={() => navigate(HOME_PAGE)}
           className="capitalize focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900"
         >

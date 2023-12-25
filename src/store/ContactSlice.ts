@@ -1,6 +1,6 @@
 import {Contact, ContactApi} from '../types';
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {createContact, getContacts, getOneContact} from './ContactThunk';
+import {createContact, deleteContact, getContacts, getOneContact, updateContact} from './ContactThunk';
 import {RootState} from '../redux/store';
 
 interface ContactState {
@@ -10,6 +10,8 @@ interface ContactState {
   createLoading: boolean;
   fetchContactsLoading: boolean;
   fetchSingleLoading: boolean;
+  updateContactLoading: boolean;
+  deleteContactLoading: boolean;
 }
 
 const initialState: ContactState = {
@@ -19,7 +21,9 @@ const initialState: ContactState = {
   createLoading: false,
   fetchContactsLoading: false,
   fetchSingleLoading: false,
-}
+  updateContactLoading: false,
+  deleteContactLoading: false,
+};
 
 export const ContactSlice = createSlice({
   name: 'contact',
@@ -59,6 +63,24 @@ export const ContactSlice = createSlice({
     builder.addCase(getOneContact.rejected, (state) => {
       state.fetchSingleLoading = false;
     });
+    builder.addCase(updateContact.pending, (state) => {
+      state.updateContactLoading = true;
+    });
+    builder.addCase(updateContact.fulfilled, (state) => {
+      state.updateContactLoading = false;
+    });
+    builder.addCase(updateContact.rejected, (state) => {
+      state.updateContactLoading = false;
+    });
+    builder.addCase(deleteContact.pending, (state) => {
+      state.deleteContactLoading = true;
+    });
+    builder.addCase(deleteContact.fulfilled, (state) => {
+      state.deleteContactLoading = false;
+    });
+    builder.addCase(deleteContact.rejected, (state) => {
+      state.deleteContactLoading = false;
+    });
 
   },
 });
@@ -71,3 +93,5 @@ export const selectorFetchContactsLoading = (state: RootState) => state.contact.
 export const selectorSelectById = (state: RootState) => state.contact.selectContact;
 export const selectorFetchSingleLoading = (state: RootState) => state.contact.fetchSingleLoading;
 export const selectorSingleContact = (state: RootState) => state.contact.singleContact;
+export const selectorUpdateContactLoading = (state: RootState) => state.contact.updateContactLoading;
+export const selectorDeleteContactLoading = (state: RootState) => state.contact.deleteContactLoading;

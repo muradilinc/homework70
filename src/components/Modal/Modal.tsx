@@ -1,11 +1,17 @@
 import React, {useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {deleteContact, getContacts, getOneContact} from '../../store/ContactThunk';
-import {selectorFetchSingleLoading, selectorSelectById, selectorSingleContact} from '../../store/ContactSlice';
+import {
+  selectorDeleteContactLoading,
+  selectorFetchSingleLoading,
+  selectorSelectById,
+  selectorSingleContact
+} from '../../store/ContactSlice';
 import {Link, useNavigate} from 'react-router-dom';
 import Spinner from '../Spinner/Spinner';
 import {placeholderImage} from '../../constansts/image';
 import {EDIT_CONTACT} from '../../constansts/routes';
+import {ButtonLoader} from '../ButtonLoader/ButtonLoader';
 
 interface Props {
   onClose: () => void;
@@ -17,6 +23,7 @@ const Modal: React.FC<Props> = ({onClose}) => {
   const id = useAppSelector(selectorSelectById);
   const singleContact = useAppSelector(selectorSingleContact);
   const getOneLoading = useAppSelector(selectorFetchSingleLoading);
+  const deleteLoading = useAppSelector(selectorDeleteContactLoading);
 
   useEffect(() => {
     dispatch(getOneContact(id));
@@ -58,27 +65,31 @@ const Modal: React.FC<Props> = ({onClose}) => {
                   <h3 className="text-4xl font-semibold mb-3 text-gray-900 dark:text-white">
                     {singleContact.name}
                   </h3>
-                  <p>Phone: <Link className="underline"
-                                  to={`tel:${singleContact.phone}`}>{singleContact.phone}</Link></p>
-                  <p>Mail: <Link className="underline"
-                                 to={`mailto:${singleContact.email}`}>{singleContact.email}</Link></p>
+                  <p>Phone: <Link className="underline" to={`tel:${singleContact.phone}`}>{singleContact.phone}</Link></p>
+                  <p>Mail: <Link className="underline" to={`mailto:${singleContact.email}`}>{singleContact.email}</Link></p>
                 </div>
               </div>
-              <div className="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+              <div className="flex items-center gap-x-5 p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
                 <button
+                  disabled={deleteLoading}
                   onClick={() => navigate(`${EDIT_CONTACT}/${id}`)}
                   type="button"
                   className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >
                   Edit
                 </button>
-                <button
-                  onClick={onDelete}
-                  type="button"
-                  className="ms-3 text-white bg-red-600 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
-                >
-                  Delete
-                </button>
+                {
+                  deleteLoading ?
+                    <ButtonLoader color='bg-red-600'/>
+                    :
+                    <button
+                      onClick={onDelete}
+                      type="button"
+                      className="ms-3 text-white bg-red-600 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+                    >
+                      Delete
+                    </button>
+                }
               </div>
             </div>
         }
